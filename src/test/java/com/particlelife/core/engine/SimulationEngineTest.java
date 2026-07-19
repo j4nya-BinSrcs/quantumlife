@@ -90,7 +90,7 @@ class SimulationEngineTest {
 
         float[] positions = new float[world.store().capacity() * 3];
         int[] species = new int[world.store().capacity()];
-        int count = engine.snapshot().readInto(positions, species);
+        int count = engine.snapshot().readInto(positions, null, species);
         assertEquals(200, count);
     }
 

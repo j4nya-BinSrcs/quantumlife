@@ -19,6 +19,7 @@ import com.particlelife.particle.ParticleStore;
 public final class FrameSnapshot {
 
     private final float[] positions;
+    private final float[] previousPositions;
     private final int[] species;
     private int count;
     private long frame;
@@ -27,6 +28,7 @@ public final class FrameSnapshot {
     /** Creates a buffer sized for {@code capacity} particles. */
     public FrameSnapshot(int capacity) {
         this.positions = new float[capacity * 3];
+        this.previousPositions = new float[capacity * 3];
         this.species = new int[capacity];
     }
 
@@ -34,8 +36,10 @@ public final class FrameSnapshot {
     public synchronized void writeFrom(ParticleStore store, long frame, double simulationTime) {
         int n = store.count();
         double[] src = store.positions();
+        double[] prev = store.previousPositions();
         for (int i = 0; i < n * 3; i++) {
             positions[i] = (float) src[i];
+            previousPositions[i] = (float) prev[i];
         }
         System.arraycopy(store.speciesIndices(), 0, species, 0, n);
         this.count = n;
@@ -47,9 +51,13 @@ public final class FrameSnapshot {
      * Copies the latest frame into the caller's arrays (render thread) and
      * returns the particle count. Arrays must hold at least
      * {@code capacity * 3} / {@code capacity} elements respectively.
+     * {@code outPreviousPositions} may be {@code null} if trails are off.
      */
-    public synchronized int readInto(float[] outPositions, int[] outSpecies) {
+    public synchronized int readInto(float[] outPositions, float[] outPreviousPositions, int[] outSpecies) {
         System.arraycopy(positions, 0, outPositions, 0, count * 3);
+        if (outPreviousPositions != null) {
+            System.arraycopy(previousPositions, 0, outPreviousPositions, 0, count * 3);
+        }
         System.arraycopy(species, 0, outSpecies, 0, count);
         return count;
     }
