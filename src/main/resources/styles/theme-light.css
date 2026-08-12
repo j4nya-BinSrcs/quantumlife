@@ -1,0 +1,145 @@
+/* Particle Life 3D — light theme */
+
+.root {
+    -fx-base: #f2f3f7;
+    -fx-background: #e9ebf1;
+    -fx-control-inner-background: #ffffff;
+    -fx-accent: #3d5cdb;
+    -fx-focus-color: #3d5cdb;
+    -fx-faint-focus-color: #3d5cdb22;
+    -fx-text-background-color: #262a35;
+    -fx-font-family: "Inter", "Segoe UI", "Cantarell", sans-serif;
+    -fx-font-size: 12.5px;
+}
+
+.sidebar {
+    -fx-background-color: #f4f5f9;
+    -fx-border-color: transparent transparent transparent #d8dbe4;
+    -fx-border-width: 0 0 0 1;
+}
+
+.sidebar .scroll-pane,
+.sidebar .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.section-pane > .title {
+    -fx-background-color: #e4e7ef;
+    -fx-background-radius: 6;
+    -fx-font-weight: bold;
+    -fx-padding: 8 10 8 10;
+}
+
+.section-pane > *.content {
+    -fx-background-color: #f2f3f7;
+    -fx-border-color: #d8dbe4;
+    -fx-border-width: 0 0 1 0;
+}
+
+.label {
+    -fx-text-fill: #2c3140;
+}
+
+.control-label {
+    -fx-text-fill: #5a6274;
+}
+
+.value-label {
+    -fx-text-fill: #16181f;
+    -fx-font-weight: bold;
+}
+
+.hover-label {
+    -fx-text-fill: #6a7288;
+    -fx-font-size: 11px;
+}
+
+.button, .toggle-button {
+    -fx-background-color: #dfe2ec;
+    -fx-text-fill: #262a35;
+    -fx-background-radius: 6;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+
+.button:hover, .toggle-button:hover {
+    -fx-background-color: #d0d4e2;
+}
+
+.button:pressed, .toggle-button:selected {
+    -fx-background-color: #3d5cdb;
+    -fx-text-fill: white;
+}
+
+.button.primary {
+    -fx-background-color: #3d5cdb;
+    -fx-text-fill: white;
+}
+
+.button.primary:hover {
+    -fx-background-color: #5a7bfc;
+}
+
+.slider .track {
+    -fx-background-color: #d3d7e3;
+}
+
+.slider .thumb {
+    -fx-background-color: #3d5cdb;
+}
+
+.check-box .box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #c3c8d8;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #3d5cdb;
+}
+
+.text-field, .combo-box, .choice-box {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 6;
+}
+
+.list-view {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 6;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 6 10 6 10;
+}
+
+.list-cell:selected {
+    -fx-background-color: #c8d2f4;
+    -fx-text-fill: #16181f;
+}
+
+.hud {
+    -fx-background-color: #ffffffcc;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+}
+
+.hud .label {
+    -fx-text-fill: #454c60;
+    -fx-font-family: "JetBrains Mono", "Consolas", monospace;
+    -fx-font-size: 11.5px;
+}
+
+.hud .headline {
+    -fx-text-fill: #10121a;
+    -fx-font-weight: bold;
+}
+
+.separator .line {
+    -fx-border-color: #d8dbe4;
+}

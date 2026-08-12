@@ -1,0 +1,151 @@
+/* Particle Life 3D — dark theme */
+
+.root {
+    -fx-base: #1b1d27;
+    -fx-background: #14151d;
+    -fx-control-inner-background: #22242f;
+    -fx-accent: #5a7bfc;
+    -fx-focus-color: #5a7bfc;
+    -fx-faint-focus-color: #5a7bfc22;
+    -fx-text-background-color: #d7dae3;
+    -fx-font-family: "Inter", "Segoe UI", "Cantarell", sans-serif;
+    -fx-font-size: 12.5px;
+}
+
+.sidebar {
+    -fx-background-color: #191b24;
+    -fx-border-color: transparent transparent transparent #262a38;
+    -fx-border-width: 0 0 0 1;
+}
+
+.sidebar .scroll-pane,
+.sidebar .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.section-pane {
+    -fx-text-fill: #aab2c8;
+}
+
+.section-pane > .title {
+    -fx-background-color: #20232f;
+    -fx-background-radius: 6;
+    -fx-font-weight: bold;
+    -fx-padding: 8 10 8 10;
+}
+
+.section-pane > *.content {
+    -fx-background-color: #1b1d27;
+    -fx-border-color: #262a38;
+    -fx-border-width: 0 0 1 0;
+}
+
+.label {
+    -fx-text-fill: #c6cbd8;
+}
+
+.control-label {
+    -fx-text-fill: #9aa2b8;
+}
+
+.value-label {
+    -fx-text-fill: #e8eaf2;
+    -fx-font-weight: bold;
+}
+
+.hover-label {
+    -fx-text-fill: #8f97ad;
+    -fx-font-size: 11px;
+}
+
+.button, .toggle-button {
+    -fx-background-color: #2a2e3d;
+    -fx-text-fill: #dde0ea;
+    -fx-background-radius: 6;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+
+.button:hover, .toggle-button:hover {
+    -fx-background-color: #353a4d;
+}
+
+.button:pressed, .toggle-button:selected {
+    -fx-background-color: #5a7bfc;
+    -fx-text-fill: white;
+}
+
+.button.primary {
+    -fx-background-color: #4560d8;
+    -fx-text-fill: white;
+}
+
+.button.primary:hover {
+    -fx-background-color: #5a7bfc;
+}
+
+.slider .track {
+    -fx-background-color: #2c3040;
+}
+
+.slider .thumb {
+    -fx-background-color: #5a7bfc;
+}
+
+.check-box .box {
+    -fx-background-color: #2a2e3d;
+    -fx-border-color: #3a4054;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #5a7bfc;
+}
+
+.text-field, .combo-box, .choice-box {
+    -fx-background-color: #22242f;
+    -fx-text-fill: #dde0ea;
+    -fx-background-radius: 6;
+}
+
+.list-view {
+    -fx-background-color: #191b24;
+    -fx-background-radius: 6;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #c6cbd8;
+    -fx-padding: 6 10 6 10;
+}
+
+.list-cell:selected {
+    -fx-background-color: #34406e;
+    -fx-text-fill: white;
+}
+
+.hud {
+    -fx-background-color: #10121add;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+}
+
+.hud .label {
+    -fx-text-fill: #aeb6cc;
+    -fx-font-family: "JetBrains Mono", "Consolas", monospace;
+    -fx-font-size: 11.5px;
+}
+
+.hud .headline {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.separator .line {
+    -fx-border-color: #262a38;
+}
