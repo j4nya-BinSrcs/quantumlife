@@ -100,7 +100,12 @@ public final class CommandManager {
     }
 
     private void refreshFlags() {
-        canUndo = !undoStack.isEmpty();
-        canRedo = !redoStack.isEmpty();
+        boolean undo = !undoStack.isEmpty();
+        boolean redo = !redoStack.isEmpty();
+        if (undo != canUndo || redo != canRedo) {
+            canUndo = undo;
+            canRedo = redo;
+            eventBus.publish(new SimulationEvent.HistoryChanged(undo, redo));
+        }
     }
 }

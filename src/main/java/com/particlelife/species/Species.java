@@ -10,17 +10,22 @@ import java.util.Objects;
  * <p>Identity is the immutable {@link #index()} — the row/column of this
  * species in the attraction matrix. Everything else is presentation or
  * physics parameterization and may change during a session.
+ *
+ * <p>The mutable fields are {@code volatile}: written on the simulation
+ * engine thread and read concurrently from the FX thread (sidebar rows,
+ * renderer palette). Writers accept a slightly stale read; a later change
+ * event repaints.
  */
 public final class Species {
 
     private final int index;
     private final SpeciesType type;
 
-    private String name;
-    private int colorRgb;
-    private double mass;
-    private double radius;
-    private boolean enabled = true;
+    private volatile String name;
+    private volatile int colorRgb;
+    private volatile double mass;
+    private volatile double radius;
+    private volatile boolean enabled = true;
 
     private Species(int index, SpeciesType type) {
         this.index = index;

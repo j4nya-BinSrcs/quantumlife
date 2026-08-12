@@ -34,4 +34,11 @@ public sealed interface SimulationEvent {
     /** Species configuration changed (count, color, name, enabled). */
     record SpeciesChanged() implements SimulationEvent {
     }
+
+    /**
+     * The undo/redo history changed — UI should re-bind {@code canUndo} /
+     * {@code canRedo} button enablement.
+     */
+    record HistoryChanged(boolean canUndo, boolean canRedo) implements SimulationEvent {
+    }
 }

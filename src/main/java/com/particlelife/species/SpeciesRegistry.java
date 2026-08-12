@@ -2,9 +2,9 @@ package com.particlelife.species;
 
 import com.particlelife.math.DeterministicRandom;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Owns the live list of species for a simulation.
@@ -13,13 +13,18 @@ import java.util.List;
  * {@code 0..count-1} so matrix rows and species line up by construction.
  * Growing re-seeds new slots from their {@link SpeciesType} archetype;
  * shrinking discards state of the removed slots.
+ *
+ * <p>The backing list is {@link CopyOnWriteArrayList}: the UI reads
+ * {@link #all()} from the FX thread while the engine thread mutates the
+ * registry (species-count changes), so iteration must never see a partial
+ * add/remove. Growth/shrink is rare, so the copy cost is negligible.
  */
 public final class SpeciesRegistry {
 
     /** Golden-angle hue stepping gives maximally separated random colors. */
     private static final double GOLDEN_ANGLE_DEGREES = 137.507764;
 
-    private final List<Species> species = new ArrayList<>();
+    private final List<Species> species = new CopyOnWriteArrayList<>();
 
     /** Creates a registry with {@code count} species seeded from archetype defaults. */
     public SpeciesRegistry(int count) {

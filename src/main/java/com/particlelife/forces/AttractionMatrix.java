@@ -18,32 +18,47 @@ import java.util.Arrays;
  * row-major array for cache-friendly access from the physics hot loop.
  *
  * <p>Not internally synchronized; the engine treats it as read-only during a
- * physics step and applies edits between steps.
+ * physics step and applies edits between steps. The storage is published as a
+ * single volatile immutable {@link View}, so a reader (UI paint, snapshot)
+ * can never observe a torn {values, size} pairing when the engine swaps the
+ * backing array on resize — it sees either the old or the new array with its
+ * matching size. A stale-but-consistent snapshot is fine for painting and
+ * self-heals next frame.
  */
 public final class AttractionMatrix {
 
     /** Attraction values live in {@code [-1, 1]}. */
     public static final double MAX_VALUE = 1.0;
 
-    private int size;
-    private double[] values;
-    private boolean symmetric;
+    /** Immutable published storage; {@code values} is row-major {@code size × size}. */
+    private static final class View {
+        final double[] values;
+        final int size;
+
+        View(double[] values, int size) {
+            this.values = values;
+            this.size = size;
+        }
+    }
+
+    private volatile View view;
+    private volatile boolean symmetric;
 
     /** Creates a zero matrix for {@code size} species. */
     public AttractionMatrix(int size) {
         requirePositive(size);
-        this.size = size;
-        this.values = new double[size * size];
+        this.view = new View(new double[size * size], size);
     }
 
     /** Number of species (rows/columns). */
     public int size() {
-        return size;
+        return view.size;
     }
 
     /** Attraction of species {@code i} toward species {@code j}. */
     public double get(int i, int j) {
-        return values[i * size + j];
+        View v = view;
+        return v.values[i * v.size + j];
     }
 
     /**
@@ -51,10 +66,11 @@ public final class AttractionMatrix {
      * {@code [-1, 1]}. In symmetric mode the mirror entry is updated too.
      */
     public void set(int i, int j, double value) {
-        double v = MathUtils.clamp(value, -MAX_VALUE, MAX_VALUE);
-        values[i * size + j] = v;
+        View v = view;
+        double clamped = MathUtils.clamp(value, -MAX_VALUE, MAX_VALUE);
+        v.values[i * v.size + j] = clamped;
         if (symmetric && i != j) {
-            values[j * size + i] = v;
+            v.values[j * v.size + i] = clamped;
         }
     }
 
@@ -69,12 +85,13 @@ public final class AttractionMatrix {
      */
     public void setSymmetric(boolean symmetric) {
         this.symmetric = symmetric;
+        View v = view;
         if (symmetric) {
-            for (int i = 0; i < size; i++) {
-                for (int j = i + 1; j < size; j++) {
+            for (int i = 0; i < v.size; i++) {
+                for (int j = i + 1; j < v.size; j++) {
                     double avg = (get(i, j) + get(j, i)) * 0.5;
-                    values[i * size + j] = avg;
-                    values[j * size + i] = avg;
+                    v.values[i * v.size + j] = avg;
+                    v.values[j * v.size + i] = avg;
                 }
             }
         }
@@ -82,12 +99,13 @@ public final class AttractionMatrix {
 
     /** Fills the matrix with uniform random values in {@code [-1, 1]}. */
     public void randomize(DeterministicRandom rng) {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
+        View v = view;
+        for (int i = 0; i < v.size; i++) {
+            for (int j = 0; j < v.size; j++) {
                 if (symmetric && j < i) {
-                    values[i * size + j] = values[j * size + i];
+                    v.values[i * v.size + j] = v.values[j * v.size + i];
                 } else {
-                    values[i * size + j] = rng.nextDouble(-MAX_VALUE, MAX_VALUE);
+                    v.values[i * v.size + j] = rng.nextDouble(-MAX_VALUE, MAX_VALUE);
                 }
             }
         }
@@ -95,7 +113,8 @@ public final class AttractionMatrix {
 
     /** Sets every entry to zero. */
     public void reset() {
-        Arrays.fill(values, 0.0);
+        View v = view;
+        Arrays.fill(v.values, 0.0);
     }
 
     /**
@@ -104,23 +123,24 @@ public final class AttractionMatrix {
      */
     public void resize(int newSize) {
         requirePositive(newSize);
-        if (newSize == size) {
+        View v = view;
+        if (newSize == v.size) {
             return;
         }
         double[] next = new double[newSize * newSize];
-        int overlap = Math.min(size, newSize);
+        int overlap = Math.min(v.size, newSize);
         for (int i = 0; i < overlap; i++) {
-            System.arraycopy(values, i * size, next, i * newSize, overlap);
+            System.arraycopy(v.values, i * v.size, next, i * newSize, overlap);
         }
-        this.size = newSize;
-        this.values = next;
+        this.view = new View(next, newSize);
     }
 
     /** Returns the matrix as a fresh 2D array (row = source species). */
     public double[][] toArray() {
-        double[][] out = new double[size][size];
-        for (int i = 0; i < size; i++) {
-            System.arraycopy(values, i * size, out[i], 0, size);
+        View v = view;
+        double[][] out = new double[v.size][v.size];
+        for (int i = 0; i < v.size; i++) {
+            System.arraycopy(v.values, i * v.size, out[i], 0, v.size);
         }
         return out;
     }
@@ -138,8 +158,7 @@ public final class AttractionMatrix {
                 next[i * n + j] = MathUtils.clamp(source[i][j], -MAX_VALUE, MAX_VALUE);
             }
         }
-        this.size = n;
-        this.values = next;
+        this.view = new View(next, n);
         if (symmetric) {
             setSymmetric(true);
         }
@@ -147,8 +166,9 @@ public final class AttractionMatrix {
 
     /** Returns a deep copy (same size, values, and symmetric flag). */
     public AttractionMatrix copy() {
-        AttractionMatrix c = new AttractionMatrix(size);
-        c.values = values.clone();
+        View v = view;
+        AttractionMatrix c = new AttractionMatrix(v.size);
+        c.view = new View(v.values.clone(), v.size);
         c.symmetric = symmetric;
         return c;
     }
