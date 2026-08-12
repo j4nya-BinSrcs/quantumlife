@@ -138,4 +138,29 @@ class CommandManagerTest {
         assertEquals(world.simulationSettings().particleCount(), count.get());
         assertFalse(commands.canUndo(), "respawn is not undoable");
     }
+
+    @Test
+    void historyChangedEventsReflectUndoRedoStackState() throws Exception {
+        AtomicInteger undo = new AtomicInteger(-1);
+        AtomicInteger redo = new AtomicInteger(-1);
+        eventBus.subscribe(SimulationEvent.HistoryChanged.class, e -> {
+            undo.set(e.canUndo() ? 1 : 0);
+            redo.set(e.canRedo() ? 1 : 0);
+        });
+
+        commands.execute(new MatrixCommands.EditCell(0, 0, 0.5));
+        sync();
+        assertEquals(1, undo.get(), "history with one entry enables undo");
+        assertEquals(0, redo.get(), "no redo history yet");
+
+        commands.undo();
+        sync();
+        assertEquals(0, undo.get());
+        assertEquals(1, redo.get());
+
+        commands.redo();
+        sync();
+        assertEquals(1, undo.get());
+        assertEquals(0, redo.get());
+    }
 }
