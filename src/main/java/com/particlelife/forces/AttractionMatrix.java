@@ -55,6 +55,16 @@ public final class AttractionMatrix {
         return view.size;
     }
 
+    /**
+     * The current row-major backing values ({@code size × size}). Read-only:
+     * callers must not modify the returned array — the engine swaps the whole
+     * view on resize, so holding this array beyond the current step may be
+     * stale but is always internally consistent.
+     */
+    public double[] values() {
+        return view.values;
+    }
+
     /** Attraction of species {@code i} toward species {@code j}. */
     public double get(int i, int j) {
         View v = view;

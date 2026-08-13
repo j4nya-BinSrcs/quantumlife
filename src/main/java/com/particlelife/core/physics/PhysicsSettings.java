@@ -35,6 +35,7 @@ public final class PhysicsSettings {
     private volatile double damping = DEFAULT_DAMPING;
     private volatile BoundaryType boundaryType = BoundaryType.WRAP;
     private volatile ForceFunctionType forceFunctionType = ForceFunctionType.PIECEWISE_LINEAR;
+    private volatile ComputeBackend computeBackend = ComputeBackend.AUTO;
 
     /** Edge length of the cubic world, centered on the origin. */
     public double worldSize() {
@@ -127,6 +128,15 @@ public final class PhysicsSettings {
         this.forceFunctionType = type == null ? ForceFunctionType.PIECEWISE_LINEAR : type;
     }
 
+    /** Which compute backend should run the force pass. */
+    public ComputeBackend computeBackend() {
+        return computeBackend;
+    }
+
+    public void setComputeBackend(ComputeBackend backend) {
+        this.computeBackend = backend == null ? ComputeBackend.AUTO : backend;
+    }
+
     /**
      * Minimum center distance used when normalizing force directions, as a
      * guard against division blow-up for coincident particles.
@@ -147,5 +157,6 @@ public final class PhysicsSettings {
         damping = DEFAULT_DAMPING;
         boundaryType = BoundaryType.WRAP;
         forceFunctionType = ForceFunctionType.PIECEWISE_LINEAR;
+        computeBackend = ComputeBackend.AUTO;
     }
 }

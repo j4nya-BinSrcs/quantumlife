@@ -1,6 +1,7 @@
 package com.particlelife.serialization;
 
 import com.particlelife.core.physics.BoundaryType;
+import com.particlelife.core.physics.ComputeBackend;
 import com.particlelife.core.physics.PhysicsSettings;
 import com.particlelife.core.simulation.SimulationSettings;
 import com.particlelife.core.simulation.SimulationWorld;
@@ -39,7 +40,8 @@ public final class WorldMapper {
                 new PresetData.PhysicsData(
                         p.worldSize(), p.interactionRadius(), p.beta(), p.forceMultiplier(),
                         p.frictionHalfLife(), p.maxVelocity(), p.timeStep(), p.damping(),
-                        p.boundaryType().name(), p.forceFunctionType().name()),
+                        p.boundaryType().name(), p.forceFunctionType().name(),
+                        p.computeBackend().name()),
                 new PresetData.SimulationData(
                         s.particleCount(), s.speciesCount(), s.seed(),
                         s.spawnRadiusFraction(), s.timeScale()));
@@ -74,6 +76,8 @@ public final class WorldMapper {
             phys.setBoundaryType(parseEnum(BoundaryType.class, p.boundaryType(), phys.boundaryType()));
             phys.setForceFunctionType(
                     parseEnum(ForceFunctionType.class, p.forceFunctionType(), phys.forceFunctionType()));
+            phys.setComputeBackend(
+                    parseEnum(ComputeBackend.class, p.computeBackend(), phys.computeBackend()));
         }
 
         int speciesCount = data.species() != null && !data.species().isEmpty()

@@ -37,7 +37,8 @@ public record PresetData(
             double timeStep,
             double damping,
             String boundaryType,
-            String forceFunctionType) {
+            String forceFunctionType,
+            String computeBackend) {
     }
 
     /** Simulation settings snapshot. */

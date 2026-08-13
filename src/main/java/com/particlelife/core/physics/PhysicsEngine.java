@@ -20,6 +20,7 @@ public final class PhysicsEngine {
 
     private final PhysicsSettings settings;
     private final ForceCalculator forceCalculator = new ForceCalculator();
+    private final GpuForceEngine gpuForce = new GpuForceEngine();
     private final Integrator integrator = new Integrator();
 
     private SpatialGrid grid;
@@ -48,8 +49,49 @@ public final class PhysicsEngine {
      */
     public void step(ParticleStore store, AttractionMatrix matrix, double dt) {
         refreshStrategies(store.capacity());
-        forceCalculator.compute(store, matrix, kernel, grid, settings, boundary.isPeriodic());
+        boolean wantGpu = wantsGpu(settings.computeBackend(), store.count(), kernelTypeInUse);
+        if (wantGpu) {
+            gpuForce.ensureInitialized();
+        }
+        if (wantGpu && gpuForce.available()) {
+            gpuForce.compute(
+                    store.positions(), store.speciesIndices(), store.forces(),
+                    store.count(), store.capacity(),
+                    matrix.values(), matrix.size(),
+                    settings.interactionRadius(), settings.minDistance(),
+                    settings.forceMultiplier() * settings.interactionRadius(),
+                    settings.worldSize(), boundary.isPeriodic(), settings.beta());
+        } else {
+            forceCalculator.compute(store, matrix, kernel, grid, settings, boundary.isPeriodic());
+        }
         integrator.integrate(store, settings, boundary, dt);
+    }
+
+    /**
+     * Whether the force pass should run on the GPU given the current selection,
+     * workload, and active kernel. {@code AUTO} always routes to the CPU
+     * spatial grid (on current hardware the GPU pass loses to it below very
+     * large populations due to per-frame transfer/sync latency), so the GPU
+     * engine is only used when explicitly selected. The smooth kernel always
+     * runs on the CPU.
+     */
+    static boolean wantsGpu(ComputeBackend selected, int particleCount, ForceFunctionType kernelType) {
+        if (kernelType != ForceFunctionType.PIECEWISE_LINEAR) {
+            return false;
+        }
+        return switch (selected) {
+            case AUTO -> false;
+            case GPU -> true;
+            case CPU -> false;
+        };
+    }
+
+    /**
+     * Releases GPU resources. Must be called from the engine thread once the
+     * simulation loop has stopped; the CPU path needs no cleanup.
+     */
+    public void close() {
+        gpuForce.close();
     }
 
     private void refreshStrategies(int capacity) {

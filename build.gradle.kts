@@ -28,6 +28,16 @@ dependencies {
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("org.xerial:sqlite-jdbc:3.46.0.0")
 
+    // LWJGL: GLFW + OpenGL bindings for the GPU compute force pass.
+    implementation(platform("org.lwjgl:lwjgl-bom:3.3.4"))
+    implementation("org.lwjgl:lwjgl")
+    implementation("org.lwjgl:lwjgl-glfw")
+    implementation("org.lwjgl:lwjgl-opengl")
+    implementation("org.lwjgl:lwjgl-egl")
+    runtimeOnly("org.lwjgl:lwjgl::natives-linux")
+    runtimeOnly("org.lwjgl:lwjgl-glfw::natives-linux")
+    runtimeOnly("org.lwjgl:lwjgl-opengl::natives-linux")
+
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

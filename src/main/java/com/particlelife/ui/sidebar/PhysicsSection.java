@@ -1,6 +1,7 @@
 package com.particlelife.ui.sidebar;
 
 import com.particlelife.core.physics.BoundaryType;
+import com.particlelife.core.physics.ComputeBackend;
 import com.particlelife.core.physics.PhysicsSettings;
 import com.particlelife.forces.ForceFunctionType;
 import com.particlelife.ui.UiContext;
@@ -67,9 +68,17 @@ public final class PhysicsSection extends SectionPane {
         kernel.setOnAction(e -> p.setForceFunctionType(kernel.getValue()));
         kernel.setMaxWidth(Double.MAX_VALUE);
 
+        ComboBox<ComputeBackend> compute = new ComboBox<>(
+                FXCollections.observableArrayList(ComputeBackend.values()));
+        compute.setValue(p.computeBackend());
+        compute.setConverter(displayNameConverter(ComputeBackend::displayName));
+        compute.setOnAction(e -> p.setComputeBackend(compute.getValue()));
+        compute.setMaxWidth(Double.MAX_VALUE);
+
         addRows(radius, force, friction, damping, maxVelocity, timeStep, beta,
                 labeledRow("Boundary", boundary),
-                labeledRow("Force kernel", kernel));
+                labeledRow("Force kernel", kernel),
+                labeledRow("Compute", compute));
     }
 
     private static HBox labeledRow(String text, javafx.scene.Node control) {

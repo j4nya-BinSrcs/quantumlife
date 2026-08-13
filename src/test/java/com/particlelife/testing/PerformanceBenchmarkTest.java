@@ -1,5 +1,6 @@
 package com.particlelife.testing;
 
+import com.particlelife.core.physics.ComputeBackend;
 import com.particlelife.core.physics.PhysicsEngine;
 import com.particlelife.core.physics.PhysicsSettings;
 import com.particlelife.core.simulation.SimulationSettings;
@@ -27,6 +28,9 @@ class PerformanceBenchmarkTest {
 
     private double millisPerStep(int particles) {
         PhysicsSettings physics = new PhysicsSettings();
+        // Benchmark the CPU engine: the GPU path is hardware-dependent and its
+        // O(N²) kernel has a different scaling signature than the spatial grid.
+        physics.setComputeBackend(ComputeBackend.CPU);
         SimulationSettings simulation = new SimulationSettings();
         simulation.setParticleCount(particles);
         SimulationWorld world = new SimulationWorld(simulation, physics);

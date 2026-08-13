@@ -1,6 +1,7 @@
 package com.particlelife.serialization;
 
 import com.particlelife.core.physics.BoundaryType;
+import com.particlelife.core.physics.ComputeBackend;
 import com.particlelife.core.physics.PhysicsSettings;
 import com.particlelife.core.simulation.SimulationSettings;
 import com.particlelife.core.simulation.SimulationWorld;
@@ -86,13 +87,14 @@ class WorldMapperTest {
         PresetData tampered = new PresetData(
                 data.species(), data.matrix(), false,
                 new PresetData.PhysicsData(200, 24, 0.3, 1, 0.04, 60, 1 / 60.0, 0,
-                        "FUTURE_BOUNDARY", "FUTURE_KERNEL"),
+                        "FUTURE_BOUNDARY", "FUTURE_KERNEL", "FUTURE_BACKEND"),
                 data.simulation());
 
         WorldMapper.apply(tampered, world);
 
         assertEquals(BoundaryType.WRAP, world.physicsSettings().boundaryType());
         assertEquals(ForceFunctionType.PIECEWISE_LINEAR, world.physicsSettings().forceFunctionType());
+        assertEquals(ComputeBackend.AUTO, world.physicsSettings().computeBackend());
     }
 
     @Test

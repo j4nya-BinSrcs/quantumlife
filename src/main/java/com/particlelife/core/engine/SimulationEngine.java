@@ -193,6 +193,9 @@ public final class SimulationEngine implements AutoCloseable {
                 LockSupport.park();
             }
         }
+        // Tear down GPU resources (and any engine state) on this thread —
+        // the GL context was created here.
+        physicsEngine.close();
         stopped.countDown();
     }
 
