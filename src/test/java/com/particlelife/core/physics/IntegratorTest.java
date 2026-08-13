@@ -178,6 +178,24 @@ class IntegratorTest {
     }
 
     @Test
+    void wrapBoundaryKeepsPreviousPositionInSamePeriodicCopy() {
+        PhysicsSettings s = noFriction();
+        s.setWorldSize(100.0);
+        ParticleStore store = new ParticleStore(4);
+        int i = store.spawn(0, 49, 0, 0, 1, 1);
+        store.setVelocity(i, 20, 0, 0);
+
+        integrator.integrate(store, s, new WrapBoundary(100.0), 0.1);
+
+        // The trail vector (current - previous) must stay within the
+        // minimum-image convention (-50, 50), not span the whole world.
+        double trailX = store.position(i, new Vector3()).x
+                - store.previousPositions()[i * 3];
+        assertTrue(Math.abs(trailX) < 50.0, "trail must not cross the world, got " + trailX);
+        assertEquals(2.0, trailX, EPS);
+    }
+
+    @Test
     void bounceBoundaryReflectsAndDamps() {
         PhysicsSettings s = noFriction();
         s.setWorldSize(100.0);

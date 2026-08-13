@@ -1,5 +1,6 @@
 package com.particlelife.core.physics;
 
+import com.particlelife.math.MathUtils;
 import com.particlelife.particle.ParticleStore;
 
 import java.util.stream.IntStream;
@@ -35,13 +36,16 @@ public final class Integrator {
         double friction = halfLife > 0.0 ? Math.pow(0.5, dt / halfLife) : 1.0;
         double globalDamping = 1.0 - settings.damping();
         double maxVelocity = settings.maxVelocity();
+        boolean periodic = boundary.isPeriodic();
+        double worldSize = settings.worldSize();
 
         IntStream indices = IntStream.range(0, count);
         if (count >= PARALLEL_THRESHOLD) {
             indices = indices.parallel();
         }
         indices.forEach(i -> integrateOne(
-                store, boundary, i, dt, friction, globalDamping, maxVelocity));
+                store, boundary, i, dt, friction, globalDamping, maxVelocity,
+                periodic, worldSize));
     }
 
     private void integrateOne(ParticleStore store,
@@ -50,7 +54,9 @@ public final class Integrator {
                               double dt,
                               double friction,
                               double globalDamping,
-                              double globalMaxVelocity) {
+                              double globalMaxVelocity,
+                              boolean periodic,
+                              double worldSize) {
         double[] positions = store.positions();
         double[] velocities = store.velocities();
         double[] forces = store.forces();
@@ -94,6 +100,17 @@ public final class Integrator {
         positions[base + 2] += vz * dt;
 
         boundary.apply(positions, velocities, base, dt);
+
+        // In a periodic world a wrap makes current and previous positions a
+        // full world apart. Adjust previous to the same periodic copy so trail
+        // vectors (current - previous) stay short instead of spanning the world.
+        if (periodic) {
+            for (int axis = 0; axis < 3; axis++) {
+                double delta = positions[base + axis] - previous[base + axis];
+                previous[base + axis] =
+                        positions[base + axis] - MathUtils.minimumImage(delta, worldSize);
+            }
+        }
 
         forces[base] = 0.0;
         forces[base + 1] = 0.0;
