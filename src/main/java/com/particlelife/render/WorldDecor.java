@@ -90,14 +90,28 @@ public final class WorldDecor {
         grid.getChildren().clear();
         double h = size / 2;
         double step = size / GRID_DIVISIONS;
+        double t = LINE_THICKNESS * 0.6;
         // Floor grid at the bottom face (y = +h; JavaFX Y grows downward).
         for (int i = 0; i <= GRID_DIVISIONS; i++) {
             double offset = -h + i * step;
-            Box alongX = edge(size, LINE_THICKNESS * 0.6, LINE_THICKNESS * 0.6, 0, h, offset);
-            Box alongZ = edge(LINE_THICKNESS * 0.6, LINE_THICKNESS * 0.6, size, offset, h, 0);
+            Box alongX = edge(size, t, t, 0, h, offset);
+            Box alongZ = edge(t, t, size, offset, h, 0);
             alongX.setMaterial(gridMaterial);
             alongZ.setMaterial(gridMaterial);
             grid.getChildren().addAll(alongX, alongZ);
+        }
+        // Wall grids on the two back faces (x = -h and z = +h). Together with
+        // the floor they frame the far corner of the default camera view.
+        for (int i = 0; i <= GRID_DIVISIONS; i++) {
+            double offset = -h + i * step;
+            Box alongZ = edge(t, t, size, -h, offset, 0);        // horizontal on x = -h
+            Box alongYonX = edge(t, size, t, -h, 0, offset);     // vertical on x = -h
+            Box alongX = edge(size, t, t, 0, offset, h);         // horizontal on z = +h
+            Box alongYonZ = edge(t, size, t, offset, 0, h);      // vertical on z = +h
+            for (Box line : new Box[] {alongZ, alongYonX, alongX, alongYonZ}) {
+                line.setMaterial(gridMaterial);
+            }
+            grid.getChildren().addAll(alongZ, alongYonX, alongX, alongYonZ);
         }
     }
 
